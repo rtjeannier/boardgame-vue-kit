@@ -1,0 +1,55 @@
+{
+  "name": "boardgame-vue-kit",
+  "version": "0.1.0",
+  "description": "A Vue 3 + Tailwind component kit for board-game UIs — cards, tokens, boards, zones, and layouts.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Roland Jeannier",
+  "keywords": [
+    "vue",
+    "vue3",
+    "board-game",
+    "component-kit",
+    "tabletop",
+    "ui-kit"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./variables.css": "./src/theme/variables.css",
+    "./style.css": "./dist/boardgame-vue-kit.css"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "typecheck": "vue-tsc --noEmit",
+    "story:dev": "histoire dev",
+    "story:build": "histoire build",
+    "story:preview": "histoire preview"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@histoire/plugin-vue": "^1.0.0-beta.1",
+    "@vitejs/plugin-vue": "^6.0.4",
+    "autoprefixer": "^10.4.20",
+    "histoire": "^1.0.0-beta.1",
+    "postcss": "^8.5.0",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.3",
+    "vite": "^7.1.0",
+    "vite-plugin-dts": "^4.3.0",
+    "vue-tsc": "^2.2.0"
+  }
+}

@@ -1,0 +1,21 @@
+node_modules
+dist
+.histoire
+.vite
+*.tsbuildinfo
+
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
