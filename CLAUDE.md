@@ -1,19 +1,23 @@
 # boardgame-vue-kit
 
-A Vue 3 + Tailwind component kit for board-game UIs. Primitives for pieces, boards, icons, and layouts — so consumers can prototype a digital board game without rebuilding the card/token/track wheel each time.
+A Vue 3 + Tailwind component kit for board-game UIs, packaged as a full-stack vibe-coding template. Primitives for pieces, boards, icons, and layouts — so consumers can prototype a digital board game without rebuilding the card/token/track wheel each time. A Python package lives alongside for rules / simulation / analysis.
 
 ## Repo layout
 
 ```
-kit/                    The published package (boardgame-vue-kit).
+kit/                    The published Vue package (boardgame-vue-kit).
 examples/drafting/      Sample consumer: solo card-drafting mini-game.
+my_project/             Python package (rules engine / simulation — rename on use).
+notebooks/              Jupyter notebooks for analysis / prototyping.
+context/                Design docs and requirements (read before architectural decisions).
 ```
 
-Monorepo via npm workspaces. The kit package has no runtime dependency on the example; the example consumes the kit as a workspace dep.
+Monorepo via npm workspaces on the JS side. The kit package has no runtime dependency on the example; the example consumes the kit as a workspace dep. Python is managed by `uv` via `pyproject.toml`.
 
 ## Commands
 
 ```bash
+# Vue kit
 npm install
 npm run build           # kit library build (ESM + .d.ts)
 npm run typecheck       # vue-tsc on kit + example
@@ -21,7 +25,21 @@ npm run story:dev       # Histoire playground at :6006
 npm run story:build     # static Histoire site
 npm run example:dev     # sample game at :5173
 npm run example:build   # build sample game
+
+# Python
+uv sync                 # install dependencies
+uv run pytest           # run tests
+uv run python <script>  # run a script
+uv add <package>        # add a runtime dependency
+uv add --dev <package>  # add a dev dependency
 ```
+
+## Python conventions
+
+- Python >=3.10, modern syntax (type hints, match statements, dict union)
+- `uv` for dependency management (never pip)
+- Keep modules focused — one responsibility per file
+- Tests go in a `tests/` directory, mirroring the package structure
 
 ## Kit architecture — the rules that matter
 
@@ -139,7 +157,12 @@ Override any design token in your app's theme file:
 ## Style guide for AI collaborators
 
 - **Don't hardcode magic numbers** in scoped CSS. Every value should come from `variables.css`. If the vocabulary is missing, extend it.
-- **Don't add Mars-specific (or any-game-specific) vocabulary** to kit components. If the word only makes sense in one game, it belongs in a consumer wrapper.
+- **Don't add game-specific vocabulary** to kit components. If the word only makes sense in one game, it belongs in a consumer wrapper.
 - **Don't add a `size` / `variant` prop to a piece** that isn't about what the piece *is*. If it's about display scale, that's a layout concern.
 - **Do write a Histoire story** for any new component or meaningful variant. Stories are how consumers discover what kit can do.
 - **Do keep the public API small.** Export from `src/index.ts` only things consumers need. Internal helpers stay internal.
+
+## Context
+
+- Design docs and requirements live in `context/`
+- Read `context/DESIGN-DOC.md` before making architectural decisions

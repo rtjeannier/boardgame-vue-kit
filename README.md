@@ -1,29 +1,51 @@
 # boardgame-vue-kit
 
-A Vue 3 + Tailwind component kit for board-game UIs. Opinionated primitives for pieces, boards, icons, and layouts — so you can prototype a digital board game without rebuilding the card/token/track wheel every time.
+A Vue 3 + Tailwind component kit for board-game UIs, scaffolded as a full-stack vibe-coding template: Python rules engine + Vue kit + devcontainer + Claude Code, ready to go.
+
+Opinionated primitives for pieces, boards, icons, and layouts — so you can prototype a digital board game without rebuilding the card/token/track wheel every time. A Python package is included for rules / simulation / analysis, alongside the Vue kit.
+
+## Use this template
+
+1. Click **"Use this template"** > **"Create a new repository"** on GitHub
+2. In VS Code, run **"Dev Containers: Clone Repository in Container Volume..."** and paste your new repo URL
+3. The container builds, `uv sync` and `npm install` run automatically — you're ready to go
+
+### First steps
+
+1. Rename `my_project/` to your Python package name; update `name` and `packages` in `pyproject.toml` to match
+2. Fill in `CLAUDE.md` with your project description and game-specific conventions
+3. Write your idea in `context/DESIGN-DOC.md`
+4. Start talking to Claude Code
 
 ## Repo layout
 
 ```
-kit/                   The published package (boardgame-vue-kit)
-examples/drafting/     A sample consumer app: solo card-drafting
+kit/                   The Vue component kit (boardgame-vue-kit)
+examples/drafting/     Sample consumer app: solo card-drafting
+my_project/            Python package (rules engine / simulation — rename on use)
+notebooks/             Jupyter notebooks
+context/               Design docs and requirements
 ```
 
-## Quickstart
-
-### Inside the monorepo
+## Commands
 
 ```bash
+# Vue kit
 npm install
 npm run story:dev      # Histoire playground at http://127.0.0.1:6006
 npm run example:dev    # Sample card-drafting game at http://127.0.0.1:5173
+npm run build          # Kit library build (ESM + .d.ts)
+npm run typecheck      # vue-tsc on kit + example
+
+# Python
+uv sync                # Install dependencies
+uv run pytest          # Run tests
+uv run python <script> # Run a script
+uv add <package>       # Add a runtime dependency
+uv add --dev <package> # Add a dev dependency
 ```
 
-### In a consumer app (when published)
-
-```bash
-npm install boardgame-vue-kit
-```
+## Using the kit in a consumer app
 
 ```ts
 // main.ts

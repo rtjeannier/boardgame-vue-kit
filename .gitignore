@@ -1,8 +1,23 @@
+# Node / Vue
 node_modules
 dist
 .histoire
 .vite
 *.tsbuildinfo
+
+# Python
+__pycache__/
+*/__pycache__/*
+.venv/
+*.pyc
+*.egg-info/
+build/
+
+# Data
+data/*
+!data/.gitkeep
+*results.json
+*data.json
 
 # OS cruft
 .DS_Store
