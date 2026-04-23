@@ -1,7 +1,9 @@
 {
-	"name": "Python 3",
-	"image": "mcr.microsoft.com/devcontainers/python:2-3.14-trixie",
+	"name": "boardgame-vue-kit",
+	"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
 	"features": {
+		"ghcr.io/devcontainers/features/python:1": { "version": "3.14" },
+		"ghcr.io/devcontainers/features/node:1": { "version": "lts" },
 		"ghcr.io/devcontainers/features/github-cli:1": {},
 		"ghcr.io/devcontainers-extra/features/live-server:1": {},
 		"ghcr.io/va-h/devcontainers-features/uv:1": {}
@@ -10,7 +12,7 @@
 	"remoteEnv": {
 		"GH_TOKEN": "${localEnv:GH_TOKEN}"
 	},
-	"postCreateCommand": "uv sync && gh auth setup-git",
+	"postCreateCommand": "uv sync && npm install && gh auth setup-git",
 
 	"customizations": {
 		"vscode": {
@@ -22,7 +24,8 @@
 				"mechatroner.rainbow-csv",
 				"ritwickdey.liveserver",
 				"ms-python.python",
-				"ms-python.vscode-pylance"
+				"ms-python.vscode-pylance",
+				"Vue.volar"
 			]
 		}
 	}
