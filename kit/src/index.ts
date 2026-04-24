@@ -1,33 +1,36 @@
 /**
  * boardgame-vue-kit — public entry.
  *
- * Consumers import components by name:
- *   import { Card, CardZone, Token, Zone, FitText } from 'boardgame-vue-kit';
+ * Flat export surface. Consumers import by name from the single path:
+ *
+ *   import { Stage, Layer, Board, Zone, Slot, Card, Token, Icon,
+ *            Button, Panel } from 'boardgame-vue-kit';
  *   import 'boardgame-vue-kit/variables.css';
+ *   import type { GameEngine, Theme, ZoneLayout } from 'boardgame-vue-kit';
+ *
+ * File-tree buckets (canvas / physical / digital) are an organizational
+ * concern for contributors and stories — not reflected in imports.
  */
 
-// Pieces — things from the game box.
-export { default as Card } from './pieces/Card.vue';
-export { default as CardZone } from './pieces/CardZone.vue';
-export { default as Deck } from './pieces/Deck.vue';
-export { default as Token } from './pieces/Token.vue';
+// Canvas — digital rendering infrastructure.
+export { default as Stage } from './canvas/Stage.vue';
+export { default as Layer } from './canvas/Layer.vue';
 
-// Boards — playing surfaces and positions.
-export { default as MultiTrack } from './boards/MultiTrack.vue';
-export { default as Slot } from './boards/Slot.vue';
-export { default as Track } from './boards/Track.vue';
-export { default as Zone } from './boards/Zone.vue';
+// Physical — things from the game box (canvas).
+export { default as Zone } from './physical/spaces/Zone.vue';
+export { default as Board } from './physical/spaces/Board.vue';
+export { default as Slot } from './physical/spaces/Slot.vue';
+export { default as Card } from './physical/pieces/Card.vue';
+export { default as Token } from './physical/pieces/Token.vue';
+export { default as Icon } from './physical/visuals/Icon.vue';
 
-// Visuals — glyphs / rendering motifs.
-export { default as Icon } from './visuals/Icon.vue';
+// Digital — chrome with no physical equivalent (DOM).
+export { default as Button } from './digital/chrome/Button.vue';
+export { default as Panel } from './digital/chrome/Panel.vue';
 
-// Layout — content-shape helpers.
-export { default as FitText } from './layout/FitText.vue';
-export { default as Scaled } from './layout/Scaled.vue';
-
-// UI chrome.
-export { default as Button } from './ui/Button.vue';
-export { default as Modal } from './ui/Modal.vue';
-
-// Composables / types.
+// Composables and types.
+export { provideTheme, useTheme, ThemeKey } from './composables/useTheme';
+export type { Theme } from './composables/useTheme';
 export type { GameEngine } from './composables/engine';
+export type { ZoneLayout, ZoneProps } from './physical/spaces/Zone.vue';
+export type { TokenShape, TokenSize } from './physical/pieces/Token.vue';
