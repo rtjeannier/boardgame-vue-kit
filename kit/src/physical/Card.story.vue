@@ -15,8 +15,8 @@ props drive state→visual via computed Konva configs. Slots receive
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
 import type Konva from 'konva';
-import Stage from '../../canvas/Stage.vue';
-import Layer from '../../canvas/Layer.vue';
+import Stage from '../canvas/Stage.vue';
+import Layer from '../canvas/Layer.vue';
 import Card from './Card.vue';
 
 const playground = reactive({
@@ -35,7 +35,7 @@ function flip() {
 </script>
 
 <template>
-  <Story title="physical/pieces/Card" group="Physical">
+  <Story title="physical/Card" group="Physical">
     <Variant title="Default — intrinsic size, empty slots">
       <Stage :width="260" :height="260">
         <Layer>

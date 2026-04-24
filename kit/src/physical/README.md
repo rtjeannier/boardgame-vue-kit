@@ -3,12 +3,14 @@
 Game-box primitives rendered on canvas via vue-konva. These components
 mirror engine state into Konva shapes; they do not enforce rules.
 
-## Buckets
+## Components
 
-- **`spaces/`** — `Zone`, `Board`, `Slot`. Containers for pieces. Zone
-  is the universal primitive; Board and Slot are thin wrappers.
-- **`pieces/`** — `Card`, `Token`. Things you'd pick up off the table.
-- **`visuals/`** — `Icon`. Rendering motifs smaller than a piece.
+- **Spaces** — `Zone`, `Board`, `Slot`. Containers for pieces. Zone
+  is the universal primitive that nests freely; Board and Slot are
+  thin wrappers (Board with a rendered surface preset; Slot for a
+  single-piece position with an empty-state affordance).
+- **Pieces** — `Card`, `Token`. Things you'd pick up off the table.
+- **Visuals** — `Icon`. Rendering motifs smaller than a piece.
 
 ## Contract
 

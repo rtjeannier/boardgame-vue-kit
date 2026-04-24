@@ -15,7 +15,7 @@ import { computed, ref } from 'vue';
 import { Rect as VRect } from 'vue-konva';
 import Zone from './Zone.vue';
 import type { ZoneLayout } from './Zone.vue';
-import { useTheme } from '../../composables/useTheme';
+import { useTheme } from '../composables/useTheme';
 
 interface Props {
   x?: number;

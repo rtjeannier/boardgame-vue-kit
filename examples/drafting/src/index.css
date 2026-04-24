@@ -1,13 +1,19 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/**
+ * Example app base styles. Uses kit design tokens loaded by
+ * `import 'boardgame-vue-kit/variables.css'` in main.ts.
+ */
+:root {
+  color-scheme: dark;
+}
 
-@layer base {
-  html, body, #app {
-    min-height: 100%;
-    margin: 0;
-    background: var(--bg-canvas);
-    color: var(--text-primary);
-    font-family: 'Inter', system-ui, sans-serif;
-  }
+html, body, #app {
+  min-height: 100%;
+  margin: 0;
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
 }

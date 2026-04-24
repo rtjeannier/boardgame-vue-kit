@@ -7,13 +7,13 @@ receives `{ w, h, color }`.
 </docs>
 
 <script setup lang="ts">
-import Stage from '../../canvas/Stage.vue';
-import Layer from '../../canvas/Layer.vue';
+import Stage from '../canvas/Stage.vue';
+import Layer from '../canvas/Layer.vue';
 import KIcon from './Icon.vue';
 </script>
 
 <template>
-  <Story title="physical/visuals/Icon" group="Physical">
+  <Story title="physical/Icon" group="Physical">
     <Variant title="Sizes (consumer paints any glyph inside)">
       <Stage :width="360" :height="120">
         <Layer>

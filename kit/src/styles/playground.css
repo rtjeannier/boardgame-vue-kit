@@ -1,20 +1,17 @@
 /**
- * Histoire-only playground styles. Sets a sensible body background
- * and imports Tailwind utilities that stories use for layout.
- * Kit components themselves do not depend on Tailwind — this is
- * just for the playground context.
+ * Histoire playground base styles. Sets a sensible body background
+ * and typography using kit design tokens — no Tailwind, no global
+ * utilities. The kit itself has no CSS dependencies beyond
+ * variables.css.
  */
+:root {
+  color-scheme: dark;
+}
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer base {
-  html, body, #app {
-    min-height: 100%;
-    margin: 0;
-    background: var(--bg-canvas);
-    color: var(--text-primary);
-    font-family: 'Inter', system-ui, sans-serif;
-  }
+html, body, #app {
+  min-height: 100%;
+  margin: 0;
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, sans-serif;
 }

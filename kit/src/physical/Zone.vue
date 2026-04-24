@@ -28,7 +28,7 @@ import { computed, ref } from 'vue';
 import { Group as VGroup } from 'vue-konva';
 import type Konva from 'konva';
 import type { VueKonvaRef } from 'vue-konva';
-import { useTheme } from '../../composables/useTheme';
+import { useTheme } from '../composables/useTheme';
 
 export type ZoneLayout = 'row' | 'col' | 'hand' | 'stack' | 'grid' | 'free';
 

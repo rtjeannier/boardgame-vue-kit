@@ -11,7 +11,7 @@ import Button from './Button.vue';
 </script>
 
 <template>
-  <Story title="digital/chrome/Button" group="Digital">
+  <Story title="digital/Button" group="Digital">
     <Variant title="Intents">
       <div class="row">
         <Button intent="primary">Primary</Button>

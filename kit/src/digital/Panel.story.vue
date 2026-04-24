@@ -21,7 +21,7 @@ const openSummary = ref(true);
 </script>
 
 <template>
-  <Story title="digital/chrome/Panel" group="Digital">
+  <Story title="digital/Panel" group="Digital">
     <Variant title="Single panel (drag, minimize, close)">
       <div class="stage-like">
         <div class="stage-like__label">simulated board (stays visible behind panel)</div>

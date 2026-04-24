@@ -16,7 +16,7 @@ import { computed, ref } from 'vue';
 import { Group as VGroup, Rect as VRect } from 'vue-konva';
 import type Konva from 'konva';
 import type { VueKonvaRef } from 'vue-konva';
-import { useTheme } from '../../composables/useTheme';
+import { useTheme } from '../composables/useTheme';
 
 interface Props {
   x?: number;

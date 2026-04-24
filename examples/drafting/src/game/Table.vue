@@ -22,8 +22,8 @@ import { computed, onMounted, onBeforeUnmount, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { Button, Panel, Stage, Layer, Zone } from 'boardgame-vue-kit';
 import { Text as VText } from 'vue-konva';
-import { useDraftStore } from '../store';
-import DraftCard from '../DraftCard.vue';
+import { useDraftStore } from './store';
+import DraftCard from './DraftCard.vue';
 
 const store = useDraftStore();
 const {

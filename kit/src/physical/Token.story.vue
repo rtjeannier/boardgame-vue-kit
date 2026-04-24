@@ -6,13 +6,13 @@ the token is*, not how it's displayed. Size uses the `--size-*` scale.
 </docs>
 
 <script setup lang="ts">
-import Stage from '../../canvas/Stage.vue';
-import Layer from '../../canvas/Layer.vue';
+import Stage from '../canvas/Stage.vue';
+import Layer from '../canvas/Layer.vue';
 import Token from './Token.vue';
 </script>
 
 <template>
-  <Story title="physical/pieces/Token" group="Physical">
+  <Story title="physical/Token" group="Physical">
     <Variant title="Shapes">
       <Stage :width="420" :height="120">
         <Layer>

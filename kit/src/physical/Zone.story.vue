@@ -19,13 +19,13 @@ a piece at each position.
 </docs>
 
 <script setup lang="ts">
-import Stage from '../../canvas/Stage.vue';
-import Layer from '../../canvas/Layer.vue';
+import Stage from '../canvas/Stage.vue';
+import Layer from '../canvas/Layer.vue';
 import Zone from './Zone.vue';
 </script>
 
 <template>
-  <Story title="physical/spaces/Zone" group="Physical">
+  <Story title="physical/Zone" group="Physical">
     <Variant title="Layouts side by side">
       <Stage :width="900" :height="520">
         <Layer>

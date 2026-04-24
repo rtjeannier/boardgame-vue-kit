@@ -18,7 +18,7 @@ import {
 } from 'vue-konva';
 import type Konva from 'konva';
 import type { VueKonvaRef } from 'vue-konva';
-import { useTheme } from '../../composables/useTheme';
+import { useTheme } from '../composables/useTheme';
 
 export type TokenShape = 'disc' | 'cube' | 'cylinder' | 'meeple';
 export type TokenSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';

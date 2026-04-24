@@ -7,13 +7,13 @@ forwards all props to Zone and fills `#surface` with a themed rect
 </docs>
 
 <script setup lang="ts">
-import Stage from '../../canvas/Stage.vue';
-import Layer from '../../canvas/Layer.vue';
+import Stage from '../canvas/Stage.vue';
+import Layer from '../canvas/Layer.vue';
 import Board from './Board.vue';
 </script>
 
 <template>
-  <Story title="physical/spaces/Board" group="Physical">
+  <Story title="physical/Board" group="Physical">
     <Variant title="Default surface preset">
       <Stage :width="500" :height="220">
         <Layer>

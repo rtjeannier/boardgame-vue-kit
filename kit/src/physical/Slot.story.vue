@@ -7,13 +7,13 @@ as a reserved spot (discard pile, tableau placeholder, Chess square).
 </docs>
 
 <script setup lang="ts">
-import Stage from '../../canvas/Stage.vue';
-import Layer from '../../canvas/Layer.vue';
+import Stage from '../canvas/Stage.vue';
+import Layer from '../canvas/Layer.vue';
 import Slot from './Slot.vue';
 </script>
 
 <template>
-  <Story title="physical/spaces/Slot" group="Physical">
+  <Story title="physical/Slot" group="Physical">
     <Variant title="Empty vs filled">
       <Stage :width="500" :height="260">
         <Layer>
