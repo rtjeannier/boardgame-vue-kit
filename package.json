@@ -15,5 +15,8 @@
     "story:build": "npm run story:build -w kit",
     "example:dev": "npm run dev -w examples/drafting",
     "example:build": "npm run build -w examples/drafting"
+  },
+  "devDependencies": {
+    "canvas": "^3.2.3"
   }
 }

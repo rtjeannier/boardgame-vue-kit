@@ -1,13 +1,11 @@
 <script setup lang="ts">
 /**
- * Button — interaction primitive.
+ * Button — DOM interaction primitive.
  *
- * `intent` drives visual weight; use `primary` for the main
- * call-to-action of a surface, `danger` for destructive ops, `ghost`
- * (default) for secondary actions.
- *
- * State (intent, disabled) lives on data-* attributes; scoped CSS
- * below decides the visual.
+ * `intent` drives visual weight: `primary` for a surface's main
+ * call-to-action, `danger` for destructive ops, `ghost` (default)
+ * for secondary actions. State lives on `data-*` attributes; scoped
+ * CSS below selects on them.
  */
 defineProps<{
   intent?: 'primary' | 'danger' | 'ghost';

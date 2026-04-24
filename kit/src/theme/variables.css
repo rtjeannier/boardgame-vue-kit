@@ -100,12 +100,37 @@
   --card-pad:      var(--gap-snug);
 
 
-  /* ─ Stacking ─ z-index ordering. */
-  --z-board:           0;
-  --z-cards:          10;
-  --z-tokens-dragged: 40;
-  --z-modals:         80;
-  --z-animations:    100;
+  /* ─ Stacking ─ DOM z-index ordering. Canvas layering is owned by Konva
+   *              Layer order, not z-index. These apply to `digital/` only. */
+  --z-panel:          80;   /* floating in-game Panel sits above canvas */
+  --z-panel-active:   81;   /* focused Panel raised by one step */
+
+  /* ─ Stage ─ Default <Stage> background fill the canvas paints before
+   *           any Layer draws. Consumers usually match the page bg. */
+  --stage-bg: var(--bg-canvas);
+
+  /* ─ Board surface ─ Defaults baked into the <Board> wrapper's #surface
+   *                   rect. Consumers override in their own theme. */
+  --board-surface-fill:      var(--bg-board);
+  --board-surface-stroke:    var(--border);
+  --board-surface-stroke-w:  1px;
+  --board-surface-radius:    var(--radius-soft);
+
+  /* ─ Slot empty affordance ─ Dashed outline a <Slot> paints when unfilled. */
+  --slot-empty-stroke:       var(--text-subtle);
+  --slot-empty-stroke-w:     1px;
+  --slot-empty-dash:         6px;
+  --slot-empty-gap:          4px;
+
+  /* ─ Panel ─ In-game floating window (non-modal, draggable). */
+  --panel-bg:            var(--bg-elevated);
+  --panel-border:        var(--border);
+  --panel-radius:        var(--radius-soft);
+  --panel-shadow:        var(--shadow-floating);
+  --panel-header-bg:     var(--bg-subtle);
+  --panel-header-pad-y:  var(--gap-snug);
+  --panel-header-pad-x:  var(--gap-normal);
+  --panel-body-pad:      var(--gap-normal);
 
   /* ─ Shape silhouettes ─ Clip-paths with no radius equivalent. Games
    *                       can redefine for their own meeple look. */

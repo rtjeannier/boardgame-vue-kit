@@ -1,82 +1,126 @@
 <script setup lang="ts">
-import { Card, CardZone } from 'boardgame-vue-kit';
+/**
+ * DraftCard — thin consumer wrapper over the kit's canvas Card.
+ * Fills the card's named slot regions with draft-specific content
+ * (suit icon, keyword, flavor, points) using Konva nodes.
+ *
+ * The kit Card handles geometry, states, shadows, and slot
+ * positioning. DraftCard maps game data to what renders where.
+ */
+import { Card } from 'boardgame-vue-kit';
+import { Text as VText, Circle as VCircle, Rect as VRect } from 'vue-konva';
 import { colorFor, type DraftCard } from './cards';
 
-/**
- * DraftCard — a thin consumer wrapper over kit `<Card>`. Fills the
- * card's slots with DraftCard data (name, suit-colored icon,
- * keyword band, flavor text, points footer).
- *
- * This is the "game layer" for a drafting-style board game: the
- * card's identity comes from the data; the kit handles geometry,
- * states, slots, clip region, and size tokens.
- */
-defineProps<{
+interface Props {
   card: DraftCard;
+  x: number;
+  y: number;
+  width?: number;
+  height?: number;
   selected?: boolean;
   inactive?: boolean;
-}>();
+  tapped?: boolean;
+}
+
+defineProps<Props>();
+
+defineEmits<{ click: [] }>();
 </script>
 
 <template>
-  <Card :selected="selected" :inactive="inactive" class="draft-card">
-    <template #name>{{ card.name }}</template>
-
-    <template #icon>
-      <span class="draft-card__suit" :style="{ background: colorFor(card.suit) }">
-        {{ card.suit.charAt(0).toUpperCase() }}
-      </span>
+  <Card
+    :x="x"
+    :y="y"
+    :width="width"
+    :height="height"
+    :selected="selected"
+    :inactive="inactive"
+    :tapped="tapped"
+    :name="card.name"
+    @click="$emit('click')"
+  >
+    <!-- suit icon (top-right badge with first letter of suit) -->
+    <template #icon="{ x: ix, y: iy, w, h }">
+      <v-circle
+        :config="{
+          x: ix + w - h / 2 - 2,
+          y: iy + h / 2,
+          radius: h / 2 - 2,
+          fill: colorFor(card.suit),
+        }"
+      />
+      <v-text
+        :config="{
+          x: ix + w - h - 2,
+          y: iy,
+          width: h,
+          height: h,
+          text: card.suit.charAt(0).toUpperCase(),
+          fontSize: Math.max(10, h * 0.55),
+          fontStyle: 'bold',
+          fill: '#000',
+          align: 'center',
+          verticalAlign: 'middle',
+        }"
+      />
     </template>
 
-    <template #effect>
-      <CardZone height="1.75rem" class="draft-card__keyword">
-        {{ card.keyword }}
-      </CardZone>
-      <CardZone fill class="draft-card__flavor">
-        {{ card.flavor }}
-      </CardZone>
+    <!-- keyword band + flavor text in the effect region -->
+    <template #effect="{ x: ex, y: ey, w, h }">
+      <v-rect
+        :config="{
+          x: ex,
+          y: ey,
+          width: w,
+          height: h * 0.3,
+          fill: 'rgba(88, 166, 255, 0.12)',
+          cornerRadius: 3,
+        }"
+      />
+      <v-text
+        :config="{
+          x: ex + 4,
+          y: ey + 4,
+          width: w - 8,
+          text: card.keyword,
+          fontSize: Math.max(9, h * 0.17),
+          fontStyle: 'bold',
+          fill: '#58a6ff',
+          wrap: 'word',
+        }"
+      />
+      <v-text
+        :config="{
+          x: ex + 4,
+          y: ey + h * 0.35,
+          width: w - 8,
+          height: h * 0.6,
+          text: card.flavor,
+          fontSize: Math.max(8, h * 0.13),
+          fontStyle: 'italic',
+          fill: '#8b949e',
+          wrap: 'word',
+          lineHeight: 1.25,
+        }"
+      />
     </template>
 
-    <template #footer>
-      <span class="draft-card__points">{{ card.points }} pts</span>
+    <!-- points in the footer (right-aligned) -->
+    <template #footer="{ x: fx, y: fy, w, h }">
+      <v-text
+        :config="{
+          x: fx,
+          y: fy,
+          width: w,
+          height: h,
+          text: `${card.points} pts`,
+          fontSize: Math.max(11, h * 0.55),
+          fontStyle: 'bold',
+          fill: '#3fb950',
+          align: 'right',
+          verticalAlign: 'middle',
+        }"
+      />
     </template>
   </Card>
 </template>
-
-<style scoped>
-.draft-card {
-  cursor: pointer;
-  transition: outline-color var(--motion-base);
-}
-
-.draft-card__suit {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.25rem;
-  height: 1.25rem;
-  border-radius: var(--radius-pill);
-  color: #000;
-  font-weight: 700;
-  font-size: 0.7rem;
-}
-
-.draft-card__keyword {
-  font-weight: 600;
-  color: var(--accent-blue);
-  font-size: 7cqi;
-}
-
-.draft-card__flavor {
-  font-style: italic;
-  color: var(--text-muted);
-  font-size: 6cqi;
-  line-height: 1.3;
-}
-
-.draft-card__points {
-  font-weight: 700;
-  color: var(--accent-green);
-  font-size: 8cqi;
-}
-</style>

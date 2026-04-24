@@ -29,9 +29,9 @@ export default defineConfig({
       fileName: () => 'index.js',
     },
     rollupOptions: {
-      external: ['vue'],
+      external: ['vue', 'konva', 'vue-konva'],
       output: {
-        globals: { vue: 'Vue' },
+        globals: { vue: 'Vue', konva: 'Konva', 'vue-konva': 'VueKonva' },
         assetFileNames: 'boardgame-vue-kit[extname]',
       },
     },
