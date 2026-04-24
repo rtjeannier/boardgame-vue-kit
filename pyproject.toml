@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "my_project"
+name = "engine"
 version = "0.1.0"
-description = ""
+description = "Game rules / simulation / analysis package. Rename when you start a project."
 requires-python = ">=3.10"
 dependencies = []
 
@@ -17,4 +17,4 @@ dev = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["my_project"]
+packages = ["engine"]

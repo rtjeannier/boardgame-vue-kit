@@ -1,168 +1,190 @@
 # boardgame-vue-kit
 
-A Vue 3 + Tailwind component kit for board-game UIs, packaged as a full-stack vibe-coding template. Primitives for pieces, boards, icons, and layouts — so consumers can prototype a digital board game without rebuilding the card/token/track wheel each time. A Python package lives alongside for rules / simulation / analysis.
+A polyglot board-game template. **`frontend/`** (Vue 3 + Konva) is a thin rendering layer. **`engine/`** (Python) owns all game rules, state, AI, and scoring. **`analysis/`** (Jupyter) explores engine output. The frontend never decides game outcomes — it renders whatever the engine produces.
 
 ## Repo layout
 
 ```
-kit/                    The published Vue package (boardgame-vue-kit).
-examples/drafting/      Sample consumer: solo card-drafting mini-game.
-my_project/             Python package (rules engine / simulation — rename on use).
-notebooks/              Jupyter notebooks for analysis / prototyping.
-context/                Design docs and requirements (read before architectural decisions).
+frontend/                    Vue 3 + Konva — rendering only
+├── kit/                     Reusable UI primitives (canvas / physical / digital)
+│   ├── canvas/              Stage, Layer (Konva infra)
+│   ├── physical/            Zone, Board, Slot, Card, Token, Icon (Konva pieces)
+│   ├── digital/             Button, Panel (DOM + scoped CSS)
+│   ├── composables/         useTheme, GameEngine interface
+│   ├── theme/variables.css  Design-token vocabulary
+│   └── index.ts             Flat export surface
+├── App.vue, main.ts, index.html, styles.css   App shell
+├── histoire.config.ts, histoire.setup.ts       Component playground
+└── package.json, vite.config.ts, tsconfig.json
+
+engine/                      Python — rules, state, simulation, AI
+└── (package source)
+
+analysis/                    Jupyter notebooks
+
+context/                     Design docs (DESIGN-DOC.md)
+pyproject.toml               Python config
 ```
 
-Monorepo via npm workspaces on the JS side. The kit package has no runtime dependency on the example; the example consumes the kit as a workspace dep. Python is managed by `uv` via `pyproject.toml`.
+One JS workspace (`frontend/`), no monorepo scaffolding. Python via `uv` + `pyproject.toml` at the root.
 
 ## Commands
 
 ```bash
-# Vue kit
+# Frontend — from frontend/
+cd frontend
 npm install
-npm run build           # kit library build (ESM + .d.ts)
-npm run typecheck       # vue-tsc on kit + example
-npm run story:dev       # Histoire playground at :6006
-npm run story:build     # static Histoire site
-npm run example:dev     # sample game at :5173
-npm run example:build   # build sample game
+npm run dev             # App at :5173
+npm run story:dev       # Histoire kit playground at :6006
+npm run build           # Production build
+npm run typecheck
 
-# Python
-uv sync                 # install dependencies
-uv run pytest           # run tests
-uv run python <script>  # run a script
-uv add <package>        # add a runtime dependency
-uv add --dev <package>  # add a dev dependency
+# Engine — from repo root
+uv sync                 # Install deps
+uv run pytest           # Tests
+uv add <pkg>            # Add runtime dep
+uv add --dev <pkg>      # Add dev dep
 ```
 
-## Python conventions
+## The architectural divide — rendering vs rules
 
-- Python >=3.10, modern syntax (type hints, match statements, dict union)
-- `uv` for dependency management (never pip)
-- Keep modules focused — one responsibility per file
-- Tests go in a `tests/` directory, mirroring the package structure
+The only test that matters for "does this belong in frontend or engine":
 
-## Kit architecture — the rules that matter
+> *If I change the rendering (swap Konva for SVG, or build a CLI version), does this code still make sense?*
 
-### Mental model — read this before editing anything
+If **yes** → it's a rule. Lives in `engine/`.
+If **no** → it's rendering. Lives in `frontend/`.
 
-1. **This is a board-game UI kit, not a dashboard kit.** Every component maps to something physical or digital on the table: *pieces* (Card, Token, Deck), *boards* (Zone, Slot, Track, MultiTrack), *visuals* (Icon), *layout helpers* (FitText, Scaled), *UI chrome* (Button, Modal). Consumers compose these into screens.
-2. **Kit is framework, consumer is composition.** The kit ships game-agnostic primitives. Nothing in `kit/` names a specific game mechanic, resource, or convention. Consumer apps wrap kit pieces with their game's identity and rules.
-3. **Scoped CSS + CSS variables for pieces; Tailwind for arranging screens.** Pieces, boards, visuals, and layout primitives style themselves via `<style scoped>`, reading radius/shadow/motion/size values from `src/theme/variables.css`. Screens and UI chrome use Tailwind utility classes for *arranging* pieces (flex, gap, grid, padding). Tailwind never appears inside a piece's template. Scoped CSS never appears in a screen.
-4. **Props describe the object; state lives on data attributes; vars decide the visual.** Props are the public API (`shape="cube"`, `selected`). Data attributes mirror state (`data-selected`, `data-tapped`). CSS variables execute the look (`var(--shadow-piece)`). All three layers are distinct — don't mix them.
+This means:
+- Card data (suit, points, cost, effect text) → engine
+- Hand dealing, turn order, scoring, AI → engine
+- Which card is visually selected, animation state, panel position → frontend
+- How a card looks when tapped/activated → frontend (it's a visual mapping of engine state)
 
-### Kit-boundary test — run before writing any kit code
+The `GameEngine` interface (`frontend/kit/composables/engine.ts`) is the contract between the two. The frontend holds a reference to an engine and mirrors its state into Konva. The engine is currently Python, but the interface is agnostic — a TS mock, a Pyodide bridge, or a remote server all satisfy the same shape.
 
-> *Would this word belong at home in Chess, Catan, Wingspan, Splendor, Ticket to Ride, or any other board game's rulebook?* If **yes** → kit. If **no** → consumer-layer.
+**Don't** build game logic in Pinia stores, Vue components, or `.ts` files in `frontend/`. If you catch yourself writing "if the card's suit is X then Y" in a Vue file, that logic belongs in engine.
 
-Universal (kit-safe): `card`, `token`, `meeple`, `deck`, `hand`, `tableau`, `draft`, `market`, `track`, `slot`, `zone`, `pool`, `stack`, `tapped`, `flipped`, `counter`, `cube`, `chit`, `tile`, `hex`, `pawn`, `marker`, `round`, `turn`, `event`.
+## Frontend — the rules that matter
 
-Kit primitives don't pre-enumerate visual conventions that are the *consumer's* choice. `<Icon>` has size + color + slot — it doesn't decide whether icons are circles or squares. That decision lives in a consumer wrapper.
+### Three buckets, one per rendering model
 
-### Taxonomy — five buckets
-
-Components group by *what they are in the physical board game*, not by abstraction level. Every component can carry state (props or store) — state is not a classification axis.
-
-| Bucket | Definition | Examples |
+| Bucket | Renders on | What lives here |
 |---|---|---|
-| `pieces/` | Things you'd find in the game box. | Card, CardZone, Token, Deck |
-| `boards/` | Playing surfaces and the positions on them. | Zone, Slot, Track, MultiTrack |
-| `ui/` | Digital chrome with no physical equivalent. | Button, Modal |
-| `visuals/` | Rendering motifs smaller than a piece — things painted on a card/board that *look like something on their own*. | Icon |
-| `layout/` | Content-shape helpers with no visual of their own. Plumbing under other components. | FitText, Scaled |
+| `canvas/` | Konva (infra) | `Stage`, `Layer`. Scaffolding; every canvas scene starts with `<Stage><Layer>…</Layer></Stage>`. |
+| `physical/` | Konva + theme | Things you'd find in the game box: `Zone`, `Board`, `Slot`, `Card`, `Token`, `Icon`. Style themselves via Konva configs that read `useTheme()`. |
+| `digital/` | DOM + scoped CSS | Chrome with no physical equivalent: `Button`, `Panel`. Style themselves via `<style scoped>` reading the same `variables.css` directly. |
 
-`composables/` holds cross-cutting behaviors (Vue composables, the `GameEngine` interface). Not a component bucket.
+These are not subfolders-for-tidiness — each bucket has a different rendering model, and they don't mix. A Card doesn't render on DOM. A Panel doesn't render on canvas. The file tree enforces it.
 
-### Primitives and composition
+### Kit-boundary test
 
-1. Every gameplay object is a Vue SFC. If you're about to write an HTML string in JS, stop and make a component.
-2. No direct DOM manipulation (`document.getElementById`, `innerHTML`, `classList.add`). Drive visuals through reactive state.
-3. Variants that describe *what a thing is* are props, not separate components. `<Token shape="cube">`, not `<CubeToken>`. Variants that describe *how it's displayed* (scale, density) are NOT props — see "Physical modeling" below.
-4. Tokens and Icons are distinct. A Token is a physical piece (chip, cube, meeple); an Icon is a glyph. A Token may wear an Icon. Not interchangeable.
-5. Tokens live inside Slots. Slots live inside Boards. Placing a Token directly on a Board without a Slot is a missing Slot.
-6. Stacking is a Slot property, not a separate component. Any Slot can stack with `stack="none|offset|fan|overlap|count"`.
-7. `visuals/` holds things that render something visible of their own (Icon, Badge, Progress). `layout/` holds things that shape other content (FitText, Scaled). If a primitive has no look of its own, it goes in `layout/`.
-8. Sizing uses container queries (`cqi`/`cqh`) for internal content scaling and the shared `xs|sm|md|lg|xl` CSS-variable scale (`--size-xs` through `--size-xl`) for external piece dimensions. No hardcoded pixels in component files. Cards use `--card-w` / `--card-h`.
+Before writing any kit code:
 
-### Physical modeling — intrinsic props only
+> *Would this word belong at home in Chess, Catan, Wingspan, Splendor, Ticket to Ride, or any other board game's rulebook?*
 
-1. Components in `pieces/` and `boards/` represent specific physical things. Their props describe what's **intrinsic to the object** — content and current state (selected, tapped, activated, flipped, counters). Props do NOT describe how the object is being displayed at the moment.
-2. Display concerns — scale, zoom, compact-vs-full density — are **not** piece props. They go through `layout/` primitives (`<Scaled>`, etc.) or a separate view-component. If you catch yourself adding `size` or `variant` to a piece to render it smaller, the prop belongs somewhere else.
-3. A piece **mirrors the engine's state; it never enforces rules**. "Can this card be tapped right now?" is engine business; the card just renders whatever state the engine produced. Kit components are trivial to reason about: state in → visual out.
-4. **Zone-driven layout**: how a group of pieces is arranged (hand, tableau, stack, draft, row, column) is owned by the `<Zone layout="...">` containing them, not by the piece. Kit ships the named policies; consumers add more via scoped CSS targeting `.zone[data-layout='...']`.
-5. A piece has its own intrinsic size set on its root via CSS vars (`--card-w` / `--card-h` for cards, `--size-md` etc. for tokens/icons). Kit `<Card>` reads those vars. Consumer wrapper components set their own size in scoped CSS. There is no `variant` or `size` prop on Card. For ad-hoc resize wrap in `<Scaled :to="..." />` from `layout/`.
+- **Yes** → kit-safe (`card`, `token`, `meeple`, `deck`, `hand`, `tableau`, `zone`, `slot`, `track`, `tapped`, `flipped`, `cube`, `tile`, `pawn`, `marker`, `round`).
+- **No** → consumer-layer. It lives in game-specific wrappers, not the kit.
 
-### Styling — scoped CSS + CSS vars for pieces; Tailwind for arranging screens
+Kit primitives don't pre-enumerate visual conventions that are the consumer's choice. `<Icon>` doesn't decide whether glyphs are circles or squares. That's a consumer wrapper's call.
 
-Two strict lanes:
+### Intrinsic-props rule
 
-- **Pieces, boards, visuals, layout primitives** (anything in `kit/pieces/`, `kit/boards/`, `kit/visuals/`, `kit/layout/`): styled via `<style scoped>`. State lives on `data-*` attributes; scoped CSS selects on them. Every radius, shadow, motion, size value comes from a named CSS var in `src/theme/variables.css`. No magic numbers in scoped CSS. No Tailwind utility strings.
-- **Screens, UI chrome, menus, sidebars** (`kit/ui/` chrome, consumer screens): Tailwind utility classes directly in the template for *arranging* pieces — `flex`, `gap-4`, `p-6`, `grid`. Tailwind is the layout tool, not the styling tool.
+Props describe what the piece **is** (intrinsic content and state), never how it's displayed.
 
-Rules that follow:
+- ✅ `selected`, `tapped`, `inactive`, `name`, `costText` — intrinsic
+- ❌ `size`, `scale`, `variant`, `compact` — display concerns
 
-1. Do not write `<style>` blocks in screen-level composition files. Compose with Tailwind.
-2. Do not write Tailwind utility strings in piece/board/visual/layout components. Use scoped CSS + CSS vars.
-3. Every named value in kit scoped CSS (`box-shadow`, `border-radius`, `transition`) references a var from `src/theme/variables.css`. Magic numbers (`9999px`, `0.15s ease`, hex colors, raw pixel shadows) are bugs. Add a new named variable if the vocabulary is missing.
-4. Consumers override kit defaults by redefining CSS vars in their own theme file (loaded after the kit's variables), or on a wrapping component's scoped selector. Don't pass Tailwind classes into kit components expecting them to override internal styling.
-5. State → styling belongs in CSS, never `<script>`. Components declare state via `data-*` attributes; scoped CSS decides the visual. No computed class strings in `<script setup>`.
-6. Text that must fit a container uses `<FitText>` (`layout/`). Don't hand-tune per-length font-size scales at the call site.
+A piece's size is intrinsic to its type (`<Card :width="…">`), not a display knob. For ad-hoc resize, wrap in a Konva `<v-group :config="{ scaleX, scaleY }">` — don't add a prop.
 
-### Card slots
+### State → visual
 
-`<Card>` slots (`#frame`, `#art`, `#icon`, `#name`, `#cost`, `#effect`, `#footer`, `#overlay`) accept any Vue content — a composition of kit primitives, an `<img>`, or nothing. Data-driven fallback renders when a slot is empty. The `#effect` slot is deliberately neutral: consumer wrappers structure game-specific ideas (rates, abilities, bonuses) inside it. For cards with multiple effect kinds, wrap each in `<CardZone height="..." />` or `<CardZone fill />` so every card of that type has its effect kinds in identical positions — a card that leaves one zone empty still has a stable layout.
+Components mirror engine state into visuals. They never enforce rules.
 
-### Theming
+- **Canvas components** translate state into computed Konva configs (stroke color for `selected`, rotation for `tapped`, opacity for `inactive`). No scoped CSS — Konva doesn't read it.
+- **DOM components** put state on `data-*` attributes; scoped CSS selects on presence (`.btn[data-intent='primary']`).
 
-`src/theme/variables.css` owns the shared design vocabulary (radii, shadows, motion, sizes, depths, z-index, default surfaces/text/accents). Consumers override individual vars in their own theme file and add game-specific ones (resource palettes, player colors). Kit components never read game-specific vars.
+Either way: state in → visual out. No `if (rules.canTap(card))` in a component — the engine decides `tapped`, the component just renders it.
 
-## Consumer quickstart
+### Zone is the universal container
 
-```ts
-// main.ts
-import { createApp } from 'vue';
-import App from './App.vue';
-import 'boardgame-vue-kit/variables.css';  // kit design tokens
-import './index.css';                        // your Tailwind + any overrides
-createApp(App).mount('#app');
-```
+"A space where components can be placed." Zones nest freely, have bounds, a `layout` policy (`row` / `col` / `hand` / `stack` / `grid` / `free`), and an optional `#surface` slot for rendered backgrounds.
+
+- **`Board`** is a thin wrapper over `Zone` that fills `#surface` with the themed playing-surface preset.
+- **`Slot`** is a thin wrapper that holds exactly one piece and paints an empty-state outline when unfilled.
+
+Zone's default slot is **scoped** — it gets called once per index with `{ index, x, y, w, h }`. Consumers use those positions to place pieces:
 
 ```vue
-<script setup lang="ts">
-import { Card, CardZone, Token, Zone } from 'boardgame-vue-kit';
+<Zone :count="hand.length" layout="hand" :x="0" :y="500" :width="900" :height="220"
+      v-slot="{ index, x, y }">
+  <Card :x="x" :y="y" :name="hand[index].name" />
+</Zone>
+```
+
+Pieces don't know what layout they're in. Zone computes positions.
+
+### Canvas slots are positioned
+
+Named slots on canvas components (e.g., `#cost`, `#name`, `#effect`, `#footer` on Card) are scoped with `{ x, y, w, h }` in parent-local coordinates. Consumers paint Konva nodes (`<v-text>`, `<v-image>`, `<v-rect>`, nested kit components) inside, using those coords to place content.
+
+Empty slots fall back to data-driven defaults (e.g., `<Card name="…">` renders default name text when `#name` isn't filled). Don't plumb rendering decisions into props — let the consumer fill a slot if they want custom.
+
+### Panel, not Modal
+
+In-game popups — pick-a-card prompts, end-of-game summaries, card-detail views — are **part of the game experience**. The player needs to see and reason about the board while the popup is open. So the primitive is `<Panel>`: DOM, draggable, minimizable, **no backdrop**, non-blocking. Click a panel to raise it; Escape to close (unless `persistent`).
+
+A blocking `Modal` (backdrop + focus trap) would be for *website-level* chrome (settings, credits) and is not shipped yet. If that use case appears, add a separate component — don't jam both behaviors into one.
+
+### Theme: one source of truth, two readers
+
+`frontend/kit/theme/variables.css` owns every radius, shadow, motion, size, color, and z-index. It's the vocabulary.
+
+- **DOM components** read CSS vars directly in scoped CSS: `background: var(--accent-blue)`.
+- **Canvas components** read through `useTheme()`, which parses the same vars at mount and refreshes on theme-toggle changes via a `MutationObserver`. `<Stage>` calls `provideTheme()`; every descendant `inject`s.
+
+Override `--accent-blue` once in a consumer stylesheet loaded after `variables.css`, and both a `<Card>` and a `<Button>` pick it up.
+
+**No Tailwind.** The kit has no utility-class dependency. Tailwind is not installed. Base page styles live in `frontend/styles.css`.
+
+### Imperative Konva handle
+
+Every physical component exposes its root Konva node:
+
+```vue
+<Card ref="cardRef" :selected="picked" />
+<script setup>
+import { ref } from 'vue';
+const cardRef = ref();
+function flipIt() { cardRef.value?.node?.to({ rotation: 180, duration: 0.3 }); }
 </script>
-
-<template>
-  <Zone layout="hand">
-    <Card v-for="c in hand" :key="c.id" :selected="c.id === picked">
-      <template #name>{{ c.name }}</template>
-      <template #effect>
-        <CardZone height="2rem">{{ c.keyword }}</CardZone>
-        <CardZone fill>{{ c.flavor }}</CardZone>
-      </template>
-    </Card>
-  </Zone>
-</template>
 ```
 
-Override any design token in your app's theme file:
+This is the escape hatch for things the declarative API can't express — tweens, custom hit regions, direct canvas drawing. Not a headline pattern; just there when needed.
 
-```css
-/* my-theme.css — loaded after boardgame-vue-kit/variables.css */
-:root {
-  --accent-blue: #ff6699;     /* your brand color */
-  --card-border-w: 3px;        /* thicker card borders */
-}
-```
+### Flat exports
+
+`frontend/kit/index.ts` re-exports everything flat. Consumers import from `./kit` (or the `@kit` alias) regardless of which bucket a component lives in. Buckets are a contributor concern.
+
+## Engine (Python) conventions
+
+- Python ≥ 3.10, modern syntax (type hints, match statements, dict union).
+- `uv` for dependency management — never pip.
+- One responsibility per module.
+- Tests in `engine/tests/` or a top-level `tests/` directory, mirroring the package structure.
+- The engine **never** imports from the frontend. The frontend imports the `GameEngine` interface type; an adapter implements it.
 
 ## Style guide for AI collaborators
 
-- **Don't hardcode magic numbers** in scoped CSS. Every value should come from `variables.css`. If the vocabulary is missing, extend it.
-- **Don't add game-specific vocabulary** to kit components. If the word only makes sense in one game, it belongs in a consumer wrapper.
-- **Don't add a `size` / `variant` prop to a piece** that isn't about what the piece *is*. If it's about display scale, that's a layout concern.
-- **Do write a Histoire story** for any new component or meaningful variant. Stories are how consumers discover what kit can do.
-- **Do keep the public API small.** Export from `src/index.ts` only things consumers need. Internal helpers stay internal.
+- **Don't write game logic in `frontend/`.** Rules, scoring, AI, deal logic belong in `engine/`.
+- **Don't hardcode magic numbers** in kit scoped CSS or Konva configs. Read from `variables.css` via `useTheme()`. If the vocabulary is missing, extend it.
+- **Don't add game-specific words** to `kit/` components. "Gold", "combat", "prestige" belong in consumer wrappers.
+- **Don't add display-variant props** to pieces (`size`, `compact`). Size is intrinsic or comes from a wrapping Konva group.
+- **Do write a Histoire story** for any new kit component or meaningful variant. Stories are how consumers discover what the kit can do.
+- **Do keep the public API small.** Export from `frontend/kit/index.ts` only what consumers need.
+- **Do put popups in a `<Panel>`** unless a true website-level blocking dialog is specifically needed.
 
 ## Context
 
-- Design docs and requirements live in `context/`
-- Read `context/DESIGN-DOC.md` before making architectural decisions
+- `context/DESIGN-DOC.md` — fill in before making significant architectural decisions.
+- `frontend/kit/physical/README.md` — the physical-layer contract in depth.

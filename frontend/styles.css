@@ -1,6 +1,7 @@
 /**
- * Example app base styles. Uses kit design tokens loaded by
- * `import 'boardgame-vue-kit/variables.css'` in main.ts.
+ * Base page styles. Used by both the app (via main.ts) and Histoire
+ * (via histoire.setup.ts). All values come from kit theme variables —
+ * override those to restyle globally.
  */
 :root {
   color-scheme: dark;

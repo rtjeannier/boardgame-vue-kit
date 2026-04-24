@@ -14,6 +14,13 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "skipLibCheck": true,
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@kit/*": ["kit/*"]
+    },
     "types": []
-  }
+  },
+  "include": ["**/*.ts", "**/*.vue", "vite.config.ts", "histoire.config.ts"],
+  "exclude": ["dist", "node_modules", ".histoire"]
 }

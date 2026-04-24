@@ -1,15 +1,12 @@
 /**
- * boardgame-vue-kit — public entry.
+ * Kit entry — every primitive the frontend consumes, re-exported flat.
  *
- * Flat export surface. Consumers import by name from the single path:
+ *   import { Stage, Layer, Zone, Card, Button, Panel } from '@kit';
+ *   import type { GameEngine, Theme } from '@kit';
  *
- *   import { Stage, Layer, Board, Zone, Slot, Card, Token, Icon,
- *            Button, Panel } from 'boardgame-vue-kit';
- *   import 'boardgame-vue-kit/variables.css';
- *   import type { GameEngine, Theme, ZoneLayout } from 'boardgame-vue-kit';
- *
- * File-tree buckets (canvas / physical / digital) are an organizational
- * concern for contributors and stories — not reflected in imports.
+ * The `canvas/`, `physical/`, `digital/` directories are an
+ * organizational concern (contributor file tree + story sidebar) —
+ * not reflected in imports.
  */
 
 // Canvas — digital rendering infrastructure.
